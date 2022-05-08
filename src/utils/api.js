@@ -35,4 +35,21 @@ axios.interceptors.response.use(success => {
             Message.error({message: '未知错误！'});
         }
     }
+    return;
 });
+
+let base = '';
+
+/**
+ * 传json格式的post请求
+ * @param url
+ * @param params
+ * @returns {AxiosPromise}
+ */
+export const postRequest = (url, params) => {
+    return axios({
+        method: 'post',
+        url: `${base}${url}`,
+        data: params
+    })
+}
