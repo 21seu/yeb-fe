@@ -5,11 +5,12 @@
       <el-aside width="200px">
         <el-menu router>
           <el-submenu index="1"
-                      v-for="(item,index) in this.$router.options.routes"
+                      v-for="(item,index) in routes"
                       :key="index"
                       v-if="!item.hidden">
-            <template slot="title"><i class="el-icon-location"></i>{{item.name}}</template>
-            <el-menu-item index="children.path"
+            <template slot="title"><i :class="item.iconCls" style="color: #1accff;margin-right: 5px"></i>{{ item.name }}
+            </template>
+            <el-menu-item :index="children.path"
                           v-for="(children,indexj) in item.children">{{ children.name }}
             </el-menu-item>
           </el-submenu>
@@ -31,7 +32,12 @@ export default {
   data() {
     return {}
   },
-  computed: {},
+  computed: {
+    routes() {
+      console.log(this.$store.state.routes)
+      return this.$store.state.routes;
+    }
+  },
   methods: {
     // menuClick(index) {
     //   this.$router.push(index);

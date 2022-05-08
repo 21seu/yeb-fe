@@ -35,7 +35,7 @@ export default {
       captchaUrl: '/captcha?time=' + new Date(),
       loginForm: {
         username: 'admin',
-        password: '123',
+        password: '123456',
         code: ''
       },
       loading: false,
@@ -63,9 +63,10 @@ export default {
           this.loading = true;
           this.postRequest('login', this.loginForm).then(resp => {
             if (resp) {
+              console.log(resp)
               this.loading = false;
               //存储用户token
-              const token = resp.obj.tokenHead + resp.obj.token;
+              const token = resp.obj.tokenHeader + ' ' + resp.obj.token
               window.sessionStorage.setItem('tokenStr', token);
               this.$router.replace("/home");
             }
