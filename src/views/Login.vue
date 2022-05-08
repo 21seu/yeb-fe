@@ -1,6 +1,13 @@
 <template>
   <div>
-    <el-form :rules="rules" ref="loginForm" :model="loginForm" class="loginContainer">
+    <el-form :rules="rules"
+             v-loading="loading"
+             element-loading-text="正在登录..."
+             element-loading-spinner="el-icon-loading"
+             element-loading-background="rgba(0, 0, 0, 0.8)"
+             ref="loginForm"
+             :model="loginForm"
+             class="loginContainer">
       <h3 class="loginTitle">系统登录</h3>
       <el-form-item prop="username">
         <el-input type="text" auto-complete="false" v-model="loginForm.username" placeholder="请输入用户名"></el-input>
@@ -20,6 +27,7 @@
 </template>
 
 <script>
+
 export default {
   name: "Login",
   data() {
@@ -30,6 +38,7 @@ export default {
         password: '123',
         code: ''
       },
+      loading: false,
       checked: true,
       rules: {
         username: [
@@ -51,11 +60,16 @@ export default {
     submitLogin(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
-
-          /*this.$message({
-            message: '登录成功！！！！',
-            type: 'success'
-          });*/
+          this.loading = true;
+          this.postRequest('login', this.loginForm).then(resp => {
+            if (resp) {
+              this.loading = false;
+              //存储用户token
+              const token = resp.obj.tokenHead + resp.obj.token;
+              window.sessionStorage.setItem('tokenStr', token);
+              this.$router.replace("/home");
+            }
+          })
         } else {
           this.$message.error('请输入所有字段！！！！');
           return false;

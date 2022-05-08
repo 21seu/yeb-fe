@@ -3,6 +3,19 @@ import {Message} from 'element-ui';
 import router from "../router";
 import el from "element-ui/src/locale/lang/el";
 
+
+// 请求拦截器
+axios.interceptors.request.use(config => {
+    if (window.sessionStorage.getItem('tokenStr')) {
+        //请求携带自定义token
+        config.headers['Authorization'] =
+            window.sessionStorage.getItem('tokenStr');
+    }
+    return config
+}, error => {
+    console.log(error);
+})
+
 /**
  * 配置响应拦截器
  */
@@ -49,6 +62,31 @@ let base = '';
 export const postRequest = (url, params) => {
     return axios({
         method: 'post',
+        url: `${base}${url}`,
+        data: params
+    })
+}
+
+//传递json的put请求
+export const putRequest = (url, params) => {
+    return axios({
+        method: 'put',
+        url: `${base}${url}`,
+        data: params
+    })
+}
+//传递json的get请求
+export const getRequest = (url, params) => {
+    return axios({
+        method: 'get',
+        url: `${base}${url}`,
+        data: params
+    })
+}
+//传递json的delete请求
+export const deleteRequest = (url, params) => {
+    return axios({
+        method: 'delete',
         url: `${base}${url}`,
         data: params
     })
