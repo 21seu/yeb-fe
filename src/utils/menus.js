@@ -42,7 +42,17 @@ export const formatRouters = (data) => {
             iconCls: iconCls,
             children: children,
             component(resolve) {
-                require(['../views' + component + '.Vue'], resolve);
+                if (component.startWith('Emp')) {
+                    require(['../views/emp/' + component + '.Vue'], resolve);
+                } else if (component.startWith('Per')) {
+                    require(['../views/per/' + component + '.Vue'], resolve);
+                } else if (component.startWith('Sal')) {
+                    require(['../views/sal/' + component + '.Vue'], resolve);
+                } else if (component.startWith('Sta')) {
+                    require(['../views/sta/' + component + '.Vue'], resolve);
+                } else if (component.startWith('Sys')) {
+                    require(['../views/sys/' + component + '.Vue'], resolve);
+                }
             }
         }
         fmtRouters.push(fmtRoute);
