@@ -68,7 +68,11 @@ export default {
               //存储用户token
               const token = resp.obj.tokenHeader + ' ' + resp.obj.token
               window.sessionStorage.setItem('tokenStr', token);
-              this.$router.replace("/home");
+
+              //页面跳转
+              let path = this.$route.query.redirect;
+              this.$router.replace((path == '/' || path == undefined) ? '/home' : path);
+              // this.$router.replace("/home");
             }
           })
         } else {
