@@ -34,6 +34,15 @@
             width="200">
         </el-table-column>
         <el-table-column
+            prop="enabled"
+            label="是否启用"
+            width="150px">
+          <template slot-scope="scope">
+            <el-tag v-if="scope.row.enabled" type="success">已启用</el-tag>
+            <el-tag v-else type="danger">未启用</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column
             label="操作">
           <template slot-scope="scope">
             <el-button
@@ -57,10 +66,27 @@
         title="编辑职位"
         :visible.sync="dialogVisible"
         width="30%">
-      <div>
-        <el-tag>职位名称</el-tag>
-        <el-input size="small" v-model="updatePos.name" class="updatePosInput"></el-input>
-      </div>
+      <table>
+        <tr>
+          <td><el-tag>职位名称</el-tag></td>
+          <td><el-input size="small" v-model="updatePos.name" class="updatePosInput"></el-input></td>
+        </tr>
+        <tr>
+          <td>
+            <el-tag>是否启用</el-tag>
+          </td>
+          <td>
+            <el-switch
+                style="margin-left: 6px"
+                v-model="updatePos.enabled"
+                active-color="#13ce66"
+                inactive-color="#ff4949"
+                active-text="已启用"
+                inactive-text="未启用">
+            </el-switch>
+          </td>
+        </tr>
+      </table>
       <span slot="footer" class="dialog-footer">
     <el-button size="small" @click="dialogVisible = false">取 消</el-button>
     <el-button size="small" type="primary" @click="doUpdate">确 定</el-button>
@@ -80,7 +106,8 @@ export default {
       positions: [],
       dialogVisible: false,
       updatePos: {
-        name: ''
+        name: '',
+        enabled: false
       },
       multipleSelection: []
     }
