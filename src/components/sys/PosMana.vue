@@ -37,7 +37,7 @@
           <template slot-scope="scope">
             <el-button
                 size="mini"
-                @click="handleEdit(scope.$index, scope.row)">编辑
+                @click="showEditView(scope.$index, scope.row)">编辑
             </el-button>
             <el-button
                 size="mini"
@@ -48,6 +48,19 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+        title="编辑职位"
+        :visible.sync="dialogVisible"
+        width="30%">
+      <div>
+        <el-tag>职位名称</el-tag>
+        <el-input size="small" v-model="updatePos.name" class="updatePosInput"></el-input>
+      </div>
+      <span slot="footer" class="dialog-footer">
+    <el-button size="small" @click="dialogVisible = false">取 消</el-button>
+    <el-button size="small" type="primary" @click="doUpdate">确 定</el-button>
+  </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -59,10 +72,22 @@ export default {
       pos: {
         name: ''
       },
-      positions: []
+      positions: [],
+      dialogVisible: false,
+      updatePos: {
+        name: ''
+      }
     }
   },
   methods: {
+    doUpdate() {
+      this.putRequest('/system/basic/pos/', this.updatePos).then(resp => {
+        if (resp) {
+          this.initPositions();
+          this.dialogVisible = false;
+        }
+      })
+    },
     addPosition() {
       if (!this.pos.name) {
         this.$message.error("职位名称不能为空")
@@ -75,7 +100,11 @@ export default {
         })
       }
     },
-    handleEdit(index, data) {
+    showEditView(index, data) {
+      //数据拷贝，防止页面上的表单数据也同步修改
+      Object.assign(this.updatePos, data);
+      this.updatePos.createDate = '';
+      this.dialogVisible = true;
 
     },
     handleDelete(index, data) {
@@ -119,5 +148,10 @@ export default {
 
 .posManaMain {
   margin-top: 10px;
+}
+
+.updatePosInput {
+  width: 200px;
+  margin-left: 8px;
 }
 </style>
