@@ -12,6 +12,7 @@
     <div class="posManaMain">
       <el-table border stripe size="small"
                 :data="positions"
+                @selection-change="handlerSelectionChange"
                 style="width: 70%">
         <el-table-column
             type="selection"
@@ -48,6 +49,10 @@
         </el-table-column>
       </el-table>
     </div>
+    <el-button size="small" style="margin-top: 8px" type="danger"
+               :disabled="this.multipleSelection.length == 0"
+               @click="deleteMany">批量删除
+    </el-button>
     <el-dialog
         title="编辑职位"
         :visible.sync="dialogVisible"
@@ -76,10 +81,39 @@ export default {
       dialogVisible: false,
       updatePos: {
         name: ''
-      }
+      },
+      multipleSelection: []
     }
   },
   methods: {
+    deleteMany() {
+      this.$confirm('此操作将永久删除【' + this.multipleSelection.length + '】条职位, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let ids = '';
+        this.multipleSelection.forEach(item => {
+          // ids += 'ids=' + item.id + '&';
+          ids += item.id + ','
+        });
+        ids = ids.substring(0, ids.length - 1)
+        this.getRequest('/system/basic/pos/batchDel?ids=' + ids).then(resp => {
+          if (resp) {
+            this.initPositions();
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    handlerSelectionChange(val) {
+      this.multipleSelection = val
+      console.log(val)
+    },
     doUpdate() {
       this.putRequest('/system/basic/pos/', this.updatePos).then(resp => {
         if (resp) {
