@@ -1,11 +1,11 @@
 <template>
   <div>
     <el-tabs v-model="activeName" type="card">
-      <el-tab-pane label="部门管理" name="DepMana">部门管理</el-tab-pane>
-      <el-tab-pane label="职位管理" name="PosMana">职位管理</el-tab-pane>
-      <el-tab-pane label="职称管理" name="JoblevelMana">职称管理</el-tab-pane>
-      <el-tab-pane label="奖惩规则" name="EcMana">奖惩规则</el-tab-pane>
-      <el-tab-pane label="权限组" name="PermissMana">权限组</el-tab-pane>
+      <el-tab-pane label="部门管理" name="DepMana"><dep-mana></dep-mana></el-tab-pane>
+      <el-tab-pane label="职位管理" name="PosMana"><pos-mana></pos-mana></el-tab-pane>
+      <el-tab-pane label="职称管理" name="JoblevelMana"><joblevel-mana></joblevel-mana></el-tab-pane>
+      <el-tab-pane label="奖惩规则" name="EcMana"><ec-mana></ec-mana></el-tab-pane>
+      <el-tab-pane label="权限组" name="PermissMana"><permiss-mana></permiss-mana></el-tab-pane>
     </el-tabs>
   </div>
 </template>
@@ -19,16 +19,16 @@ import PosMana from "../../components/sys/PosMana";
 
 export default {
   name: "SysBasic",
-  components: [
+  components: {
     DepMana,
     EcMana,
     JoblevelMana,
     PermissMana,
     PosMana
-  ],
+  },
   data() {
     return {
-      activeName: 'DepMana'
+      activeName: 'PosMana'
     }
   }
 }
