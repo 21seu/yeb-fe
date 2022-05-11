@@ -28,7 +28,7 @@ export default {
   },
   data() {
     return {
-      activeName: 'PosMana'
+      activeName: 'JoblevelMana'
     }
   }
 }
