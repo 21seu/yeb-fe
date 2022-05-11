@@ -19,7 +19,7 @@
       <el-container>
         <el-aside width="200px">
           <el-menu router>
-            <el-submenu index="1"
+            <el-submenu :index="index"
                         v-for="(item,index) in routes"
                         :key="index"
                         v-if="!item.hidden">
