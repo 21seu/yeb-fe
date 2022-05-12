@@ -9,14 +9,25 @@
     </div>
     <div class="premissManaMain">
       <el-collapse accordion v-model="activeName" @change="change">
-        <el-collapse-item :title="r.nameZh" name="r.id" v-for="(r,index) in roles" :key="index">
+        <el-collapse-item :title="r.nameZh" :name="r.id" v-for="(r,index) in roles" :key="index">
           <el-card class="box-card">
             <div slot="header" class="clearfix">
               <span>可访问资源</span>
               <el-button style="float: right; padding: 3px 0;color: red" type="text" icon="el-icon-delete"></el-button>
             </div>
             <div>
-              <el-tree show-checkbox :data="allMenus" :props="defaultProps"></el-tree>
+              <el-tree
+                  show-checkbox
+                  :data="allMenus"
+                  :props="defaultProps"
+                  :default-checked-keys="selectMenus"
+                  ref="tree"
+                  node-key="id">
+              </el-tree>
+              <div style="display: flex;justify-content: flex-end">
+                <el-button size="mini" @click="cancalUpdate">取消修改</el-button>
+                <el-button size="mini" type="primary" @click="doUpdate(r.id,index)">确认修改</el-button>
+              </div>
             </div>
           </el-card>
         </el-collapse-item>
@@ -34,20 +45,47 @@ export default {
         name: '',
         nameZh: ''
       },
-      activeName: '2',
+      activeName: -1,
       roles: [],
       allMenus: [],
       defaultProps: {
         children: 'children',
         label: 'name'
-      }
+      },
+      selectMenus: []
     }
   },
   methods: {
+    cancalUpdate() {
+      this.activeName = -1;
+    },
+    doUpdate(rid, index) {
+      let tree = this.$refs.tree[index];
+      console.log(tree);
+      let selectedKeys = tree.getCheckedKeys(true);
+      let url = '/system/basic/permiss/?rid=' + rid;
+      selectedKeys.forEach(key => {
+        url += '&mids=' + key;
+      });
+      this.putRequest(url).then(resp => {
+        if (resp) {
+          this.initRoles();
+          this.activeName = -1;
+        }
+      })
+    },
     change(rid) {
       if (rid) {
         this.initAllMenus();
+        this.initSelectMenus(rid);
       }
+    },
+    initSelectMenus(rid) {
+      this.getRequest('/system/basic/permiss/mid/' + rid).then(resp => {
+        if (resp) {
+          this.selectMenus = resp;
+        }
+      })
     },
     initAllMenus() {
       this.getRequest('/system/basic/permiss/menus').then(resp => {
