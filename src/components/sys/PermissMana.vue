@@ -4,8 +4,8 @@
       <el-input size="small" placeholder="请输入角色英文名" v-model="role.name">
         <template slot="prepend">ROLE_</template>
       </el-input>
-      <el-input size="small" v-model="role.nameZh" placeholder="请输入角色中文名"></el-input>
-      <el-button size="small" type="primary" icon="el-icon-plus">添加角色</el-button>
+      <el-input size="small" v-model="role.nameZh" placeholder="请输入角色中文名" @keydown.enter.native="doAddRole"></el-input>
+      <el-button size="small" type="primary" icon="el-icon-plus" @click="doAddRole">添加角色</el-button>
     </div>
     <div class="premissManaMain">
       <el-collapse accordion v-model="activeName" @change="change">
@@ -13,7 +13,8 @@
           <el-card class="box-card">
             <div slot="header" class="clearfix">
               <span>可访问资源</span>
-              <el-button style="float: right; padding: 3px 0;color: red" type="text" icon="el-icon-delete"></el-button>
+              <el-button style="float: right; padding: 3px 0;color: red" type="text" icon="el-icon-delete"
+                         @click="doDelete(r)"></el-button>
             </div>
             <div>
               <el-tree
@@ -22,10 +23,11 @@
                   :props="defaultProps"
                   :default-checked-keys="selectMenus"
                   ref="tree"
+                  :key="index"
                   node-key="id">
               </el-tree>
               <div style="display: flex;justify-content: flex-end">
-                <el-button size="mini" @click="cancalUpdate">取消修改</el-button>
+                <el-button size="mini" @click="cancelUpdate">取消修改</el-button>
                 <el-button size="mini" type="primary" @click="doUpdate(r.id,index)">确认修改</el-button>
               </div>
             </div>
@@ -56,7 +58,38 @@ export default {
     }
   },
   methods: {
-    cancalUpdate() {
+    doDelete(r) {
+      this.$confirm('此操作将永久删除【' + r.nameZh + '】职位, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.postRequest('/system/basic/permiss/role/' + r.id).then(resp => {
+          if (resp) {
+            this.initRoles();
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    doAddRole() {
+      if (this.role.name && this.role.nameZh) {
+        this.postRequest('/system/basic/permiss/role', this.role).then(resp => {
+          if (resp) {
+            this.initRoles();
+            this.role.name = '';
+            this.role.nameZh = '';
+          }
+        })
+      } else {
+        this.$message.error("所有字段不能为空")
+      }
+    },
+    cancelUpdate() {
       this.activeName = -1;
     },
     doUpdate(rid, index) {
@@ -69,7 +102,6 @@ export default {
       });
       this.putRequest(url).then(resp => {
         if (resp) {
-          this.initRoles();
           this.activeName = -1;
         }
       })
