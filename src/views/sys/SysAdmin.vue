@@ -1,15 +1,16 @@
 <template>
   <div>
     <div style="display: flex;justify-content: center;margin-top: 10px">
-      <el-input size="small" placeholder="通过用户名搜索用户..." prefix-icon="el-icon-search"
+      <el-input v-model="keywords" size="small" placeholder="通过用户名搜索用户..." prefix-icon="el-icon-search"
                 style="width: 400px;margin-right: 10px"></el-input>
-      <el-button size="small" type="primary" icon="el-icon-search">搜索</el-button>
+      <el-button size="small" type="primary" icon="el-icon-search" @click="doSearch">搜索</el-button>
     </div>
     <div class="admin-container">
       <el-card class="admin-card" v-for="(admin,index) in admins" :key="index">
         <div slot="header" class="clearfix">
           <span>{{ admin.name }}</span>
-          <el-button style="float: right; padding: 3px 0;color: red" type="text" icon="el-icon-delete"></el-button>
+          <el-button style="float: right; padding: 3px 0;color: red" type="text" icon="el-icon-delete"
+                     @click="deleteAdmin(admin)"></el-button>
         </div>
         <div>
           <div class="img-container">
@@ -23,6 +24,7 @@
           <div>地址：{{ admin.address }}</div>
           <div>用户状态：
             <el-switch
+                @change="enabledChange(admin)"
                 v-model="admin.enabled"
                 active-color="#13ce66"
                 inactive-color="#ff4949"
@@ -50,12 +52,41 @@ export default {
   name: "SysAdmin",
   data() {
     return {
-      admins: []
+      admins: [],
+      keywords: '',
     }
   },
   methods: {
+    enabledChange(admin) {
+      this.putRequest('/system/admin/', admin).then(resp => {
+        if (resp) {
+          this.initAdmins();
+        }
+      })
+    },
+    deleteAdmin(admin) {
+      this.$confirm('此操作将永久删除【' + admin.name + '】操作员, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteRequest('/system/admin/' + admin.id).then(resp => {
+          if (resp) {
+            this.initAdmins();
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
+    doSearch() {
+      this.initAdmins();
+    },
     initAdmins() {
-      this.getRequest('/system/admin/').then(resp => {
+      this.getRequest('/system/admin/?keywords=' + this.keywords).then(resp => {
         if (resp) {
           this.admins = resp;
         }
