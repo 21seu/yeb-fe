@@ -115,6 +115,9 @@ export default {
           //   d.children = []
           // }
           d.children = d.children.concat(dep);
+          if (d.children.length > 0) {
+            d.isParent = true;
+          }
           return;
         } else {
           this.addDep2Deps(d.children, dep);
@@ -136,8 +139,41 @@ export default {
       this.pname = data.name
       this.dialogVisible = true;
     },
-    deleteAddDep() {
-
+    removeDepFromDeps(p, deps, id) {
+      for (let i = 0; i < deps.length; i++) {
+        let d = deps[i];
+        if (d.id == id) {
+          deps.splice(i, 1);
+          if (deps.length == 0) {
+            p.isParent = false;
+          }
+          return;
+        } else {
+          this.removeDepFromDeps(d, d.children, id);
+        }
+      }
+    },
+    deleteAddDep(data) {
+      if (data.isParent) {
+        this.$message.error("父部门不能删除")
+      } else {
+        this.$confirm('此操作将永久删除[' + data.name + ']部门, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.deleteRequest('/system/basic/department/' + data.id).then(resp => {
+            if (resp) {
+              this.removeDepFromDeps(null, this.deps, data.id);
+            }
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+      }
     },
     initDeps() {
       this.getRequest('/system/basic/department/').then(resp => {
