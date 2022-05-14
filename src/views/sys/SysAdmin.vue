@@ -36,7 +36,24 @@
             <el-tag size="small" style="margin-right: 10px" type="success" v-for="(role,indexj) in admin.roles"
                     :key="indexj">{{ role.nameZh }}
             </el-tag>
-            <el-button type="text" icon="el-icon-more"></el-button>
+            <el-popover
+                @hide="hidePop(admin)"
+                @show="showPop(admin)"
+                placement="right"
+                title="角色列表"
+                width="200"
+                trigger="click"
+            >
+              <el-select size="small" v-model="selectRoles" multiple placeholder="请选择">
+                <el-option
+                    v-for="(r,index) in allRoles"
+                    :key="index"
+                    :label="r.nameZh"
+                    :value="r.id">
+                </el-option>
+              </el-select>
+              <el-button slot="reference" type="text" icon="el-icon-more"></el-button>
+            </el-popover>
           </div>
           <div>
             备注：{{ admin.remark }}
@@ -54,9 +71,57 @@ export default {
     return {
       admins: [],
       keywords: '',
+      allRoles: [],
+      selectRoles: []
     }
   },
   methods: {
+    hidePop(admin) {
+      let roles = [];
+      Object.assign(roles, admin.roles);
+      let flag = false;
+      if (roles.length != this.selectRoles.length) flag = true;
+      else {
+        for (let i = 0; i < roles.length; i++) {
+          let role = roles[i];
+          for (let j = 0; j < this.selectRoles.length; j++) {
+            let sr = this.selectRoles[j];
+            if (role.id == sr) {
+              roles.splice(i, 1);
+              i--;
+              break;
+            }
+          }
+        }
+        if (roles.length != 0) flag = true;
+      }
+      if (flag) {
+        let url = '/system/admin/role?adminId=' + admin.id;
+        this.selectRoles.forEach(r => {
+          url += '&rids=' + r;
+        });
+        this.putRequest(url).then(resp => {
+          if (resp) {
+            this.initAdmins();
+          }
+        })
+      }
+    },
+    showPop(admin) {
+      this.initAllRoles();
+      let roles = admin.roles;
+      this.selectRoles = [];
+      roles.forEach(r => {
+        this.selectRoles.push(r.id);
+      })
+    },
+    initAllRoles() {
+      this.getRequest('/system/admin/roles').then(resp => {
+        if (resp) {
+          this.allRoles = resp;
+        }
+      })
+    },
     enabledChange(admin) {
       this.putRequest('/system/admin/', admin).then(resp => {
         if (resp) {
