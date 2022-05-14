@@ -306,14 +306,19 @@
               </el-col>
               <el-col :span="6">
                 <el-form-item field="departmentId" label="部门:" prop="departmentId">
-                  <el-select v-model="emp.departmentId" size="mini" style="width: 150px" placeholder="部门">
-                    <el-option
-                        v-for="item in options"
-                        :key="item.value"
-                        :label="item.label"
-                        :value="item.value">
-                    </el-option>
-                  </el-select>
+                  <el-popover
+                      placement="bottom"
+                      title="请选择部门"
+                      width="200"
+                      trigger="manual"
+                      v-model="visible">
+                    <el-tree default-expand-all :data="allDeps" :props="defaultProps"
+                             @node-click="handleNodeClick"></el-tree>
+                    <div slot="reference"
+                         style="width: 150px;display: inline-flex;border: 1px solid #dedede;height: 24px; border-radius: 5px;cursor: pointer; align-items: center;font-size: 13px;padding-left: 8px;box-sizing: border-box"
+                         @click="showDevView">{{ inputDepName }}
+                    </div>
+                  </el-popover>
                 </el-form-item>
               </el-col>
               <el-col :span="7">
@@ -449,7 +454,14 @@ export default {
   name: "EmpBasic",
   data() {
     return {
+      defaultProps: {
+        children: 'children',
+        label: 'name'
+      },
+      allDeps: [],
+      visible: false,
       loading: false,
+      inputDepName: '',
       emps: [],
       total: 0,
       currentPage: 1,
@@ -493,6 +505,14 @@ export default {
     }
   },
   methods: {
+    handleNodeClick(data) {
+      this.emp.departmentId = data.id;
+      this.inputDepName = data.name;
+      this.visible = false;
+    },
+    showDevView() {
+      this.visible = true;
+    },
     getMaxWorkId() {
       this.getRequest('/employee/basic/maxWorkID').then(resp => {
         if (resp) {
@@ -538,6 +558,17 @@ export default {
         })
       } else {
         this.politicsstatus = JSON.parse(sessionStorage.getItem('politicsstatus'));
+      }
+
+      if (!window.sessionStorage.getItem('allDeps')) {
+        this.getRequest('/employee/basic/deps').then(resp => {
+          if (resp) {
+            this.allDeps = resp;
+            window.sessionStorage.setItem('allDeps', JSON.stringify(resp));
+          }
+        })
+      } else {
+        this.allDeps = JSON.parse(sessionStorage.getItem('allDeps'));
       }
     },
     showAddEmpView() {
