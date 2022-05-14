@@ -204,7 +204,7 @@
           :visible.sync="dialogVisible"
           width="80%">
         <div>
-          <el-form ref="empForm" :model="emp">
+          <el-form ref="empForm" :model="emp" :rules="rules">
             <el-row>
               <el-col :span="6">
                 <el-form-item field="name" label="姓名:" prop="name">
@@ -442,7 +442,7 @@
         </div>
         <span slot="footer" class="dialog-footer">
             <el-button @click="dialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+            <el-button type="primary" @click="doAddEmp">确 定</el-button>
         </span>
       </el-dialog>
     </div>
@@ -488,7 +488,7 @@ export default {
         specialty: "",
         school: "",
         beginDate: '',
-        workState: "",
+        workState: '在职',
         workId: '',
         conversionTime: '',
         notWorkDate: '',
@@ -501,10 +501,53 @@ export default {
       politicsstatus: [],
       joblevels: [],
       positions: [],
-      tiptopDegree: ['博士', '硕士', '本科', '大专', '高中', '初中', '小学']
+      tiptopDegree: ['博士', '硕士', '本科', '大专', '高中', '初中', '小学'],
+      rules: {
+        name: [{required: true, message: '请输入员工姓名', trigger: 'blur'}],
+        gender: [{required: true, message: '请输入性别', trigger: 'blur'}],
+        birthday: [{required: true, message: '请输入出生日期', trigger: 'blur'}],
+        idCard: [{required: true, message: '请输入身份证', trigger: 'blur'}],
+        wedlock: [{required: true, message: '请输入婚姻状况', trigger: 'blur'}],
+        nationId: [{required: true, message: '请输入民族', trigger: 'blur'}],
+        nativePlace: [{required: true, message: '请输入籍贯', trigger: 'blur'}],
+        politicId: [{required: true, message: '请输入政治面貌', trigger: 'blur'}],
+        phone: [{required: true, message: '请输入电话', trigger: 'blur'}],
+        email: [{required: true, message: '请输入邮箱地址', trigger: 'blur'}, {
+          type: 'email',
+          message: '邮箱地址格式不正确',
+          trigger: 'blur'
+        }],
+        address: [{required: true, message: '请输入地址', trigger: 'blur'}],
+        departmentId: [{required: true, message: '请输入部门', trigger: 'blur'}],
+        jobLevelId: [{required: true, message: '请输入职称', trigger: 'blur'}],
+        posId: [{required: true, message: '请输入职位', trigger: 'blur'}],
+        tiptopDegree: [{required: true, message: '请输入学历', trigger: 'blur'}],
+        specialty: [{required: true, message: '请输入专业', trigger: 'blur'}],
+        school: [{required: true, message: '请输入毕业院校', trigger: 'blur'}],
+        beginDate: [{required: true, message: '请输入入职日期', trigger: 'blur'}],
+        workState: [{required: true, message: '请输入工作状态', trigger: 'blur'}],
+        workId: [{required: true, message: '请输入工号', trigger: 'blur'}],
+        conversionTerm: [{required: true, message: '请输入合同期限', trigger: 'blur'}],
+        conversionTime: [{required: true, message: '请输入转正日期', trigger: 'blur'}],
+        beginContract: [{required: true, message: '请输入合同起始日期', trigger: 'blur'}],
+        endContract: [{required: true, message: '请输入合同结束日期', trigger: 'blur'}],
+        notWorkDate: [{required: true, message: '请输入离职日期', trigger: 'blur'}]
+      }
     }
   },
   methods: {
+    doAddEmp() {
+      this.$refs['empForm'].validate(valid => {
+        if (valid) {
+          this.postRequest('/employee/basic/', this.emp).then(resp => {
+            if (resp) {
+              this.dialogVisible = false;
+              this.initEmps();
+            }
+          });
+        }
+      });
+    },
     handleNodeClick(data) {
       this.emp.departmentId = data.id;
       this.inputDepName = data.name;
