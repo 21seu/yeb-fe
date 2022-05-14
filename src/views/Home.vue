@@ -3,11 +3,11 @@
     <el-container>
       <el-header class="homeHeader">
         <div class="title">
-          云E办
+          云E办公系统
         </div>
         <el-dropdown class="userInfo" @command="commandHandler">
         <span class="el-dropdown-link">
-          {{ user.name }}<i><img :src="user.userFace"></i>
+          {{ user.name }}<i><img class="el-dropdown-link" :src="user.userFace"/></i>
         </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item command="userinfo">个人中心</el-dropdown-item>
@@ -94,6 +94,7 @@ export default {
     }
   },
   created() {
+    console.log(this.user)
   }
 }
 </script>
