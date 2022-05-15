@@ -2,7 +2,7 @@
   <div>
     <div style="display: flex;justify-content: space-between">
       <el-button size="small" type="primary" icon="el-icon-plus" @click="showAddSalaryView">添加工资账套</el-button>
-      <el-button size="small" type="success" icon="el-icon-refresh"></el-button>
+      <el-button size="small" type="success" icon="el-icon-refresh" @click="initSalaries"></el-button>
     </div>
     <div style="margin-top: 10px">
       <el-table
@@ -87,14 +87,16 @@
         </el-table-column>
         <el-table-column
             label="操作">
-          <el-button size="small" type="primary">编辑</el-button>
-          <el-button size="small" type="danger">删除</el-button>
+          <template slot-scope="scope">
+            <el-button size="small" type="primary" @click="editSal(scope.row)">编辑</el-button>
+            <el-button size="small" type="danger" @click="deleteSal(scope.row)">删除</el-button>
+          </template>
         </el-table-column>
       </el-table>
     </div>
 
     <el-dialog
-        title="添加工资账套"
+        :title="title"
         :visible.sync="dialogVisible"
         width="50%">
       <div style="display: flex;justify-content: space-around;align-items: center">
@@ -118,6 +120,7 @@ export default {
   name: "SalSob",
   data() {
     return {
+      title: '',
       activeItemIndex: 0,
       salaries: [],
       dialogVisible: false,
@@ -150,6 +153,41 @@ export default {
     }
   },
   methods: {
+    editSal(data) {
+      this.title = '编辑工资账套';
+      this.activeItemIndex = 0;
+      this.salary.id = data.id;
+      this.salary.name = data.name;
+      this.salary.basicSalary = data.basicSalary;
+      this.salary.trafficSalary = data.trafficSalary;
+      this.salary.lunchSalary = data.lunchSalary;
+      this.salary.bonus = data.bonus;
+      this.salary.pensionPer = data.pensionPer;
+      this.salary.pensionBase = data.pensionBase;
+      this.salary.medicalPer = data.medicalPer;
+      this.salary.medicalBase = data.medicalBase;
+      this.salary.accumulationFundPer = data.accumulationFundPer;
+      this.salary.accumulationFundBase = data.accumulationFundBase;
+      this.dialogVisible = true;
+    },
+    deleteSal(data) {
+      this.$confirm('此操作将永久删除' + data.name + ', 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        this.deleteRequest('/salary/sob/' + data.id).then(resp => {
+          if (resp) {
+            this.initSalaries();
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
+    },
     preStep() {
       if (this.activeItemIndex == 0) {
         return;
@@ -161,17 +199,27 @@ export default {
     },
     nextStep() {
       if (this.activeItemIndex == 10) {
-        this.postRequest('/salary/sob/', this.salary).then(resp => {
-          if (resp) {
-            this.initSalaries();
-            this.dialogVisible = false;
-          }
-        })
+        if (this.salary.id){
+          this.putRequest('/salary/sob/', this.salary).then(resp => {
+            if (resp) {
+              this.initSalaries();
+              this.dialogVisible = false;
+            }
+          })
+        }else{
+          this.postRequest('/salary/sob/', this.salary).then(resp => {
+            if (resp) {
+              this.initSalaries();
+              this.dialogVisible = false;
+            }
+          })
+        }
         return;
       }
       this.activeItemIndex++;
     },
     showAddSalaryView() {
+      this.title = '添加工资账套';
       this.salary = {
         name: "",
         basicSalary: 0,
