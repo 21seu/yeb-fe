@@ -3,6 +3,8 @@ import VueRouter from 'vue-router'
 import Login from '../views/Login.vue'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
+import Home from "../views/Home";
+import FriendChat from "../views/chat/FriendChat";
 
 Vue.use(VueRouter)
 Vue.use(ElementUI);
@@ -12,7 +14,17 @@ const routes = [
         path: '/',
         name: 'Login',
         component: Login,
-        hidden:true
+        hidden: true
+    },
+    {
+        path: '/home',
+        name: 'Home',
+        component: Home,
+        children: [{
+            path: '/chat',
+            name: '在线聊天',
+            component: FriendChat
+        }]
     }
     /*{
       path: '/about',

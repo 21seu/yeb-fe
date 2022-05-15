@@ -5,16 +5,23 @@
         <div class="title">
           云E办公系统
         </div>
-        <el-dropdown class="userInfo" @command="commandHandler">
+        <div>
+          <el-button type="text"
+                     icon="el-icon-bell"
+                     size="normal"
+                     style="color: black;margin-right: 8px"
+          @click="doChat"></el-button>
+          <el-dropdown class="userInfo" @command="commandHandler">
         <span class="el-dropdown-link">
           {{ user.name }}<i><img class="el-dropdown-link" :src="user.userFace"/></i>
         </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="userinfo">个人中心</el-dropdown-item>
-            <el-dropdown-item command="setting">设置</el-dropdown-item>
-            <el-dropdown-item command="logout">注销</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item command="userinfo">个人中心</el-dropdown-item>
+              <el-dropdown-item command="setting">设置</el-dropdown-item>
+              <el-dropdown-item command="logout">注销</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </div>
       </el-header>
       <el-container>
         <el-aside width="200px">
@@ -66,6 +73,9 @@ export default {
     }
   },
   methods: {
+    doChat(){
+      this.$router.push('/chat');
+    },
     // menuClick(index) {
     //   this.$router.push(index);
     // }
@@ -132,7 +142,8 @@ export default {
   color: #409eff;
   padding-top: 40px;
 }
-.homeRouterView{
+
+.homeRouterView {
   margin-top: 10px;
 }
 </style>
