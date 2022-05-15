@@ -101,7 +101,8 @@
         <el-steps direction="vertical" :active="activeItemIndex">
           <el-step :title="itemName" v-for="(itemName,index) in salaryItemName" :key="index"></el-step>
         </el-steps>
-        <el-input :placeholder="'请输入'+itemName+'...'" v-for="(itemName,index) in salaryItemName"
+        <el-input v-model="salary[title]" :placeholder="'请输入'+salaryItemName[index]+'...'"
+                  v-for="(value,title,index) in salary"
                   :key="index" v-show="activeItemIndex==index" style="width: 200px"></el-input>
       </div>
       <span slot="footer" class="dialog-footer">
@@ -133,6 +134,19 @@ export default {
         '公积金比率',
         '公积金基数'
       ],
+      salary: {
+        name: "",
+        basicSalary: 0,
+        trafficSalary: 0,
+        lunchSalary: 0,
+        bonus: 0,
+        pensionPer: 0,
+        pensionBase: 0,
+        medicalPer: 0,
+        medicalBase: 0,
+        accumulationFundPer: 0,
+        accumulationFundBase: 0
+      }
     }
   },
   methods: {
@@ -147,12 +161,30 @@ export default {
     },
     nextStep() {
       if (this.activeItemIndex == 10) {
-        alert(1)
+        this.postRequest('/salary/sob/', this.salary).then(resp => {
+          if (resp) {
+            this.initSalaries();
+            this.dialogVisible = false;
+          }
+        })
         return;
       }
       this.activeItemIndex++;
     },
     showAddSalaryView() {
+      this.salary = {
+        name: "",
+        basicSalary: 0,
+        trafficSalary: 0,
+        lunchSalary: 0,
+        bonus: 0,
+        pensionPer: 0,
+        pensionBase: 0,
+        medicalPer: 0,
+        medicalBase: 0,
+        accumulationFundPer: 0,
+        accumulationFundBase: 0
+      }
       this.activeItemIndex = 0;
       this.dialogVisible = true;
     },
