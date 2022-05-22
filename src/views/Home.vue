@@ -68,7 +68,6 @@ export default {
   },
   computed: {
     routes() {
-      console.log(this.$store.state.routes)
       return this.$store.state.routes;
     },
     user() {
