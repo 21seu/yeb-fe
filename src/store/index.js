@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import {getRequest} from "../utils/api";
+import SockJS from 'sockjs-client';
+import Stomp from 'stompjs';
 
 Vue.use(Vuex)
 
@@ -11,12 +13,18 @@ const now = new Date();
 const store = new Vuex.Store({
     state: {
         routes: [],
-        sessions: [],
+        sessions: {},
         admins: [],
+        currentAdmin: 1,
         currentSessionId: -1,
-        filterKey: ''
+        filterKey: '',
+        stomp: null,
+        idDot: {}
     },
     mutations: {
+        INIT_ADMIN(state, admin) {
+            state.currentAdmin = admin;
+        },
         initRoutes(state, data) {
             state.routes = data;
         },
@@ -43,6 +51,30 @@ const store = new Vuex.Store({
         }
     },
     actions: {
+        connect(context) {
+            let token = window.localStorage.getItem('token')
+            context.state.stomp = null
+            let sockjs = new SockJS('/ws/ep', null, {timeout: 15000})
+            context.state.stomp = Stomp.over(sockjs);
+            context.state.stomp.connect({'Auth-Token': token}, success => {
+                context.state.stomp.subscribe('/user/queue/chat', msg => {
+                    let resMsg = JSON.parse(msg.body)
+                    console.log(resMsg)
+                })
+            }, error => {
+                console.log(error)
+            })
+
+            // context.state.stomp = Stomp.over(new SockJS('/ws/ep'), null, {timeout: 15000});
+            // let token = window.sessionStorage.getItem("tokenStr")
+            // context.state.stomp.connect({'Auth-Token': token}, success => {
+            //     context.state.stomp.subscribe("user/queue/chat", msg => {
+            //         console.log(msg.body);
+            //     })
+            // }, error => {
+            //
+            // });
+        },
         initData(context) {
             getRequest('/chat/admin').then(resp => {
                 if (resp) {

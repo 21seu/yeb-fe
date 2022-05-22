@@ -10,7 +10,7 @@
                      icon="el-icon-bell"
                      size="normal"
                      style="color: black;margin-right: 8px"
-          @click="doChat"></el-button>
+                     @click="doChat"></el-button>
           <el-dropdown class="userInfo" @command="commandHandler">
         <span class="el-dropdown-link">
           {{ user.name }}<i><img class="el-dropdown-link" :src="user.userFace"/></i>
@@ -63,17 +63,20 @@ export default {
 
   data() {
     return {
-      user: JSON.parse(window.sessionStorage.getItem('user'))
+      // user: JSON.parse(window.sessionStorage.getItem('user'))
     }
   },
   computed: {
     routes() {
       console.log(this.$store.state.routes)
       return this.$store.state.routes;
+    },
+    user() {
+      return this.$store.state.currentAdmin;
     }
   },
   methods: {
-    doChat(){
+    doChat() {
       this.$router.push('/chat');
     },
     // menuClick(index) {
@@ -100,6 +103,9 @@ export default {
             message: '已取消'
           });
         });
+      }
+      if (command == 'userinfo') {
+        this.$router.push('/userinfo');
       }
     }
   },

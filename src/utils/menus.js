@@ -17,6 +17,8 @@ export const initMenu = (router, store) => {
 
             //将数据存入vuex
             store.commit('initRoutes', fmtRoutes);
+            //连接webScoket
+            //store.dispatch('connect');
         }
     })
 }

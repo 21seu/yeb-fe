@@ -5,6 +5,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import Home from "../views/Home";
 import FriendChat from "../views/chat/FriendChat";
+import AdminInfo from "../views/AdminInfo";
 
 Vue.use(VueRouter)
 Vue.use(ElementUI);
@@ -24,7 +25,12 @@ const routes = [
             path: '/chat',
             name: '在线聊天',
             component: FriendChat
-        }]
+        },
+            {
+                path: '/userinfo',
+                name: '个人中心',
+                component: AdminInfo
+            }]
     }
     /*{
       path: '/about',
